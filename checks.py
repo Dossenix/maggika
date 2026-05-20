@@ -1,5 +1,13 @@
 import discord
+
 from config import settings
+
+
+async def send_ephemeral(interaction: discord.Interaction, message: str) -> None:
+    if interaction.response.is_done():
+        await interaction.followup.send(message, ephemeral=True)
+    else:
+        await interaction.response.send_message(message, ephemeral=True)
 
 
 def is_staff(member: discord.Member) -> bool:
@@ -12,11 +20,11 @@ def is_staff(member: discord.Member) -> bool:
 
 async def require_staff(interaction: discord.Interaction) -> bool:
     if not isinstance(interaction.user, discord.Member):
-        await interaction.response.send_message("Il comando è utilizzabile unicamente nel server.", ephemeral=True)
+        await send_ephemeral(interaction, "Comando usabile solo dentro il server.")
         return False
 
     if not is_staff(interaction.user):
-        await interaction.response.send_message("Non hai i permessi necessari per eseguire tale comando.", ephemeral=True)
+        await send_ephemeral(interaction, "Non hai i permessi per usare questo comando.")
         return False
 
     return True

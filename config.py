@@ -1,19 +1,29 @@
 import os
 from dataclasses import dataclass
 from pathlib import Path
+
 from dotenv import load_dotenv
+
 
 load_dotenv()
 
-def env_int(name: str) -> int | none:
+
+def env_int(name: str) -> int | None:
     value = os.getenv(name, "").strip()
     return int(value) if value.isdigit() else None
 
-def evn_int_list(name: str) -> list[int]:
-    values = os.getenv(name, "")
-    return [int(x.strip()) for x in values.split(",") if x.strip().isdigit()]
 
-@dataclass
+def env_int_list(name: str) -> list[int]:
+    raw = os.getenv(name, "")
+    return [int(item.strip()) for item in raw.split(",") if item.strip().isdigit()]
+
+
+def env_minutes(name: str, default: int) -> int:
+    value = os.getenv(name, str(default)).strip()
+    return int(value) if value.isdigit() else default
+
+
+@dataclass(frozen=True)
 class Settings:
     token: str
     guild_id: int | None
@@ -23,23 +33,21 @@ class Settings:
     castamagic_channel_id: int | None
     report_channel_id: int | None
     ticket_category_id: int | None
-    disbord_bot_id: int | None
-    bump_ping_role_id: int | None
-    disbord_reminder_minutes: int
+    disboard_bot_id: int | None
+    disboard_reminder_minutes: int
     db_path: Path
 
+
 settings = Settings(
-    token=os.getenv("DISCORD_TOKEN", ""),
+    token=os.getenv("DISCORD_TOKEN", "").strip(),
     guild_id=env_int("GUILD_ID"),
     verified_role_id=env_int("VERIFIED_ROLE_ID"),
-    staff_role_ids=evn_int_list("STAFF_ROLE_IDS"),
+    staff_role_ids=env_int_list("STAFF_ROLE_IDS"),
     castamagic_role_id=env_int("CASTAMAGIC_ROLE_ID"),
     castamagic_channel_id=env_int("CASTAMAGIC_CHANNEL_ID"),
     report_channel_id=env_int("REPORT_CHANNEL_ID"),
     ticket_category_id=env_int("TICKET_CATEGORY_ID"),
-    disbord_bot_id=env_int("DISBORD_BOT_ID"),
-    bump_ping_role_id=env_int("BUMP_PING_ROLE_ID"),
-    disbord_reminder_minutes=env_int("DISBORD_REMINDER_MINUTES") or 60,
-    db_path=Path(os.getenv("DB_PATH", "data.db")),
+    disboard_bot_id=env_int("DISBOARD_BOT_ID"),
+    disboard_reminder_minutes=env_minutes("DISBOARD_REMINDER_MINUTES", 120),
+    db_path=Path(os.getenv("DB_PATH", "maggika.sqlite3")),
 )
-
