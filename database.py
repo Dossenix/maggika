@@ -1,11 +1,18 @@
 import sqlite3
+from pathlib import Path
 
 from config import settings
 
 
 def db() -> sqlite3.Connection:
+    if settings.db_path.parent != Path("."):
+        settings.db_path.parent.mkdir(parents=True, exist_ok=True)
+
     conn = sqlite3.connect(settings.db_path)
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA journal_mode = MEMORY")
+    conn.execute("PRAGMA temp_store = MEMORY")
+    conn.execute("PRAGMA synchronous = NORMAL")
     return conn
 
 
