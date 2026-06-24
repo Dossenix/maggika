@@ -746,7 +746,7 @@ class Hours(commands.Cog):
         embed.add_field(name="Totale registrato", value=f"`{format_duration(total)}`", inline=True)
         embed.add_field(name="Servizio", value=f"`{format_minutes(total_minutes)}`", inline=True)
         embed.add_field(name="Cartellino aperto", value=active_text, inline=True)
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="hours_reset", description="Resetta le ore di uno staff.")
     @app_commands.describe(staff="Staff da resettare", motivo="Motivo del reset")
@@ -784,13 +784,17 @@ class Hours(commands.Cog):
                 (interaction.guild.id, staff.id),
             )
 
-        await interaction.response.send_message(
-            (
-                f"Ore di {staff.mention} resettate.\n"
-                f"Totale archiviato: `{format_duration(total)}` (`{format_minutes(total_minutes)}`)."
-            ),
-            ephemeral=True,
+        embed = discord.Embed(
+            title="Reset ore staff",
+            color=discord.Color.orange(),
+            timestamp=now_dt(),
         )
+        embed.add_field(name="Staff", value=staff.mention, inline=True)
+        embed.add_field(name="Resettato da", value=interaction.user.mention, inline=True)
+        embed.add_field(name="Totale archiviato", value=f"`{format_duration(total)}`", inline=True)
+        embed.add_field(name="Servizio archiviato", value=f"`{format_minutes(total_minutes)}`", inline=True)
+        embed.add_field(name="Motivo", value=motivo, inline=False)
+        await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="cartellino_annulla", description="Annulla un timbro/cartellino registrato.")
     @app_commands.describe(
